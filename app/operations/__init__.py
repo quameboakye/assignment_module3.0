@@ -1,14 +1,23 @@
-def addition(a, b):
-    return a + b
+class Operations:
+    
+    @staticmethod
+    def addition(a: float, b: float) -> float:
+        """Return the sum of two numbers."""
+        return a + b
 
+    @staticmethod
+    def subtraction(a: float, b: float) -> float:
+        """Return the difference between two numbers."""
+        return a - b
 
-def subtraction(a, b):
-    return a - b
+    @staticmethod
+    def multiplication(a: float, b: float) -> float:
+        """Return the product of two numbers."""
+        return a * b
 
-
-def multiplication(a, b):
-    return a * b
-
-
-def division(a, b):
-    return a / b
+    @staticmethod
+    def division(a: float, b: float) -> float:
+        """Return the quotient of two numbers."""
+        if b == 0:
+            raise ValueError("Division by zero is not allowed.")
+        return a / b

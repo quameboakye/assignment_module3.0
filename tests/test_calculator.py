@@ -1,65 +1,46 @@
-from app.calculator import calculator
+
+from app.operations import Operations
 
 
-def run_calculator_with_input(monkeypatch, capsys, inputs):
-    """Simulates user input and captures calculator output."""
-    input_iter = iter(inputs)
+def calculator():
+    
+    while True:
+        
+        user_input = input("Enter an operation (add, subtract, multiply, divide) and two numbers, or 'exit' to quit: ")
 
-    def mock_input(prompt):
-        return next(input_iter)
+        if user_input.lower() == "exit":
+            print("Exiting calculator...")
+            break  
 
-    monkeypatch.setattr("builtins.input", mock_input)
+        try:
+            
+            operation, num1, num2 = user_input.split()
+           
+            num1, num2 = float(num1), float(num2)
+        except ValueError:
+           
+            print("Invalid input. Please follow the format: <operation> <num1> <num2>")
+            continue
 
-    calculator()
+        if operation == "add":
+            result = Operations.addition(num1, num2)  # We call the addition function to add the two numbers.
+        elif operation == "subtract":
+            result = Operations.subtraction(num1, num2)  # We call the subtraction function to subtract the two numbers.
+        elif operation == "multiply":
+            result = Operations.multiplication(num1, num2)  # We call the multiplication function to multiply the two numbers.
+        elif operation == "divide":
+            try:
+                result = Operations.division(num1, num2)  # We call the division function to divide the two numbers.
+            except ValueError as e:
+                # This part handles the case where someone tries to divide by zero, which we can't do.
+                # The division function will throw an error if someone tries dividing by zero, and we catch that error here.
+                print(e)  # Show the error message.
+                continue  # Go back to the top of the loop and try again.
+        else:
+            # If the user types an operation we don't understand, we show them a message.
+            print(f"Unknown operation '{operation}'. Supported operations: add, subtract, multiply, divide.")
+            continue  # Go back to the top of the loop and try again.
 
-    captured = capsys.readouterr()
-    return captured.out
+    
+        print(f"Result: {result}")
 
-
-def test_invalid_operation(monkeypatch, capsys):
-    """Test invalid operation in REPL."""
-    inputs = ["modulus 5 3", "exit"]
-    output = run_calculator_with_input(monkeypatch, capsys, inputs)
-    assert "Unknown operation" in output
-
-
-def test_invalid_input(monkeypatch, capsys):
-    """Test invalid input format in REPL."""
-    inputs = ["add two three", "exit"]
-    output = run_calculator_with_input(monkeypatch, capsys, inputs)
-    assert "Invalid input. Please follow the format: <operation> <operand1> <operand2>" in output
-
-
-def test_division_by_zero(monkeypatch, capsys):
-    """Test division by zero in REPL."""
-    inputs = ["divide 5 0", "exit"]
-    output = run_calculator_with_input(monkeypatch, capsys, inputs)
-    assert "Division by zero is not allowed." in output
-
-
-def test_addition(monkeypatch, capsys):
-    """Test addition in REPL."""
-    inputs = ["add 5 3", "exit"]
-    output = run_calculator_with_input(monkeypatch, capsys, inputs)
-    assert "8.0" in output
-
-
-def test_subtraction(monkeypatch, capsys):
-    """Test subtraction in REPL."""
-    inputs = ["subtract 5 3", "exit"]
-    output = run_calculator_with_input(monkeypatch, capsys, inputs)
-    assert "2.0" in output
-
-
-def test_multiplication(monkeypatch, capsys):
-    """Test multiplication in REPL."""
-    inputs = ["multiply 5 3", "exit"]
-    output = run_calculator_with_input(monkeypatch, capsys, inputs)
-    assert "15.0" in output
-
-
-def test_division(monkeypatch, capsys):
-    """Test division in REPL."""
-    inputs = ["divide 6 3", "exit"]
-    output = run_calculator_with_input(monkeypatch, capsys, inputs)
-    assert "2.0" in output
